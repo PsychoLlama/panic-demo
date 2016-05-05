@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Panic-client</title>
+		<meta charset="utf-8">
+		<meta name='viewport' content='width=device-width; initial-scale=1'>
+
+		<style>
+			body {
+				margin: 0;
+				font-family: sans-serif;
+				color: #404448;
+				background-color: #f4f6f8;
+			}
+
+			header {
+				background-color: white;
+				padding: 2em;
+				border-bottom: 0.1em solid #f0f0f0;
+			}
+			header h1 {
+				margin: 0;
+			}
+
+			.card {
+				width: 42.5vw;
+				margin: 2% 5%;
+				box-sizing: border-box;
+				border: 0.1em solid #f0f0f0;
+				box-shadow: 0 0.15em 5px -4px #e8e8e8;
+				background-color: white;
+				padding: 20px;
+				float: left;
+			}
+
+			.status {
+				text-align: center;
+			}
+			.status h2 {
+				margin: 0;
+			}
+
+			#connected.true {
+				color: #35a7ff;
+			}
+			#connected.false {
+				color: #ff5964;
+			}
+
+			#jobs > div {
+				padding: 0.4em 0;
+			}
+
+			a.job {
+				padding-bottom: 5px;
+				font-family: monospace;
+				font-size: 120%;
+			}
+
+			a.job:hover {
+				border-bottom: 0.08em solid #e8e8e8;
+				cursor: pointer;
+			}
+
+			.source {
+				padding: 0.6em;
+				margin: 0.8em 1em;
+				border-left: 5px solid #e8e8e8;
+				line-height: 1.4em;
+			}
+
+			@media (max-width: 768px) {
+				.card {
+					width: 90vw;
+					margin: 3% 5%;
+				}
+			}
+			@media (min-width: 769px) {
+				.card:nth-child(even) {
+					margin-right: 2.5%;
+				}
+				.card:nth-child(odd) {
+					margin-left: 2.5%;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>Panic client</h1>
+		</header>
+
+		<div class='status card'>
+			<h2>Status: <span id="connected">not connected</span></h2>
+		</div>
+
+		<div id='jobs' class='card'></div>
+
+		<script src="http://{{IP_ADDRESS}}:8080/panic.js"></script>
+		<script>
+			panic.server('http://{{IP_ADDRESS}}:8080');
+
+			function setView(state, connected) {
+				var status = document.getElementById('connected');
+				status.innerHTML = state;
+				status.setAttribute('class', connected);
+			}
+
+			// panic.connection.on('connect', function () {
+			// 	var status = document.querySelector('.connected');
+			// 	status.innerHTML = 'Connected';
+			// 	status.setAttribute('class', 'connected true');
+			// });
+			panic.connection.on('disconnect', function () {
+				setView('disconnected', false);
+			});
+
+			var jobs = document.getElementById('jobs');
+
+			// create the job handler
+			panic.connection.on('run', function (raw, job, vars) {
+				var entry = document.createElement('div');
+				var a = document.createElement('a');
+				a.className = 'job';
+				a.innerHTML = job;
+				var source = document.createElement('div');
+				source.innerHTML = raw;
+				source.className = 'source';
+				source.style.display = 'none';
+				a.onclick = function () {
+					var style = source.style;
+					style.display = style.display.match(/none/) ? 'block' : 'none';
+				};
+				entry.innerHTML = 'Job: ';
+				entry.appendChild(a);
+				entry.appendChild(source);
+				jobs.appendChild(entry);
+			});
+		</script>
+	</body>
+</html>
