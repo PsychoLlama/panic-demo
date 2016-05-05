@@ -19,6 +19,6 @@
     "ip": "^1.1.2",
     "jasmine": "^2.4.1",
     "mocha": "^2.4.5",
-    "panic-server": "^0.2.3"
+    "panic-server": "^0.2.4"
   }
 }

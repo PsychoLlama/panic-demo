@@ -18,7 +18,14 @@ var server = http.Server(function (req, res) {
 
 panic.server(server).listen(8080, function () {
 	console.log('\n\nThe server is running!');
-	console.log('Open "http://localhost:8080/" in your browser');
+	console.log(
+		'You can connect by going to "http://localhost:8080/"' +
+		'in your browser.'
+	);
+	console.log(
+		'\nOthers on the same network can join by going here:',
+		'\n\n\thttp://' + ip + ':8080\n\n'
+	);
 });
 
 var browsers = panic.clients.filter(function (client) {
@@ -28,8 +35,28 @@ var browsers = panic.clients.filter(function (client) {
 browsers.on('add', function (client) {
 	client = new panic.ClientList().add(client);
 	client.run(function () {
-		window.setView('connected', true);
+		window.setStatus('connected', true);
 	});
+	client.run(function () {
+		window.setMsg('Hello Ogden.js!');
+	});
+});
+
+browsers.on('add', function () {
+	if (browsers.len() >= 3) {
+
+		browsers.run(function () {
+			var i, req;
+			for (i = 0; i < 1000; i++) {
+				req = new XMLHttpRequest();
+				req.open('GET', this.data.url);
+				req.onerror = this.fail;
+				req.send();
+			}
+		}, {
+			url: 'http://' + ip + ':8080/panic.js'
+		});
+	}
 });
 
 module.exports = panic.clients;

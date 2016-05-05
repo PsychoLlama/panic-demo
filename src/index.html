@@ -12,14 +12,19 @@
 				color: #404448;
 				background-color: #f4f6f8;
 			}
+			h1, h2, h3, blockquote {
+				margin: 0;
+			}
+
+			blockquote {
+				font-size: 150%;
+				line-height: 1.4em;
+			}
 
 			header {
 				background-color: white;
 				padding: 2em;
 				border-bottom: 0.1em solid #f0f0f0;
-			}
-			header h1 {
-				margin: 0;
 			}
 
 			.card {
@@ -70,6 +75,10 @@
 				font-family: sans-serif;
 			}
 
+			#message {
+				color: #606468;
+			}
+
 			@media (max-width: 768px) {
 				.card {
 					width: 90vw;
@@ -95,23 +104,29 @@
 			<h2>Status: <span id="connected">not connected</span></h2>
 		</div>
 
+		<div class="card">
+			<blockquote id="message">
+				<em>No message</em>
+			</blockquote>
+		</div>
+
 		<div id='jobs' class='card'></div>
 
 		<script src="http://{{IP_ADDRESS}}:8080/panic.js"></script>
 		<script>
 			panic.server('http://{{IP_ADDRESS}}:8080');
 
-			function setView(state, connected) {
+			function setStatus(state, connected) {
 				var status = document.getElementById('connected');
 				status.innerHTML = state;
 				status.setAttribute('class', connected);
 			}
 
-			// panic.connection.on('connect', function () {
-			// 	var status = document.querySelector('.connected');
-			// 	status.innerHTML = 'Connected';
-			// 	status.setAttribute('class', 'connected true');
-			// });
+			function setMsg(msg) {
+				var container = document.getElementById('message');
+				container.innerHTML = msg;
+			}
+
 			panic.connection.on('disconnect', function () {
 				setView('disconnected', false);
 			});
