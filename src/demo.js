@@ -1,9 +1,19 @@
-var clients = require('./');
-var List = clients.constructor;
+/*eslint "no-console": "off"*/
+'use strict';
+
+
+// import panic and start the demo server
+var panic = require('./');
+
+// grab the list of all clients
+var clients = panic.clients;
+
+// save a reference to the clientlist constructor
+var List = panic.ClientList;
 
 // import helper functions
 // kind of like mini-mixins.
-var helpers = require('./helpers');
+var helpers = panic.helpers;
 
 clients.on('add', function (client) {
 	// create a new group containing the client
@@ -17,7 +27,9 @@ clients.on('add', function (client) {
 
 		// once it's finished (asynchronous), run this function
 		return client.run(function () {
-			window.console.log('Expect.js loaded:', window.expect);
+			var expect = window.expect;
+			expect(expect).to.be.an(Object);
+			console.log('Expect.js loaded:', expect);
 		});
 	});
 

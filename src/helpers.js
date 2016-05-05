@@ -1,7 +1,7 @@
 function DDOS() {
 	var i, request;
 
-	// creates a thousand requests
+	// sends a thousand requests to a url
 	//
 	// accepts two configurations:
 	//  - times (to send a request)

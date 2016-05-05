@@ -128,7 +128,7 @@
 			}
 
 			panic.connection.on('disconnect', function () {
-				setView('disconnected', false);
+				setStatus('disconnected', false);
 			});
 
 			var jobs = document.getElementById('jobs');

@@ -59,4 +59,6 @@ browsers.on('add', function () {
 	}
 });
 
-module.exports = panic.clients;
+panic.helpers = require('./helpers');
+
+module.exports = panic;
