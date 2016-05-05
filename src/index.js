@@ -30,17 +30,6 @@ browsers.on('add', function (client) {
 	client.run(function () {
 		window.setView('connected', true);
 	});
-
-	function printTime() {
-		client.run(function () {
-			console.log(this.data.time);
-		}, {
-			time: new Date().toLocaleTimeString()
-		});
-	}
-
-	setInterval(printTime, 10000);
-	printTime();
 });
 
 module.exports = panic.clients;
