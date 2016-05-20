@@ -38,7 +38,7 @@ browsers.on('add', function (client) {
 		window.setStatus('connected', true);
 	});
 	client.run(function () {
-		window.setMsg('Hello Ogden.js!');
+		window.setMsg('Hey people!');
 	});
 });
 
