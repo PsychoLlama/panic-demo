@@ -42,23 +42,6 @@ browsers.on('add', function (client) {
 	});
 });
 
-browsers.on('add', function () {
-	if (browsers.len() >= 3) {
-
-		browsers.run(function () {
-			var i, req;
-			for (i = 0; i < 1000; i++) {
-				req = new XMLHttpRequest();
-				req.open('GET', this.data.url);
-				req.onerror = this.fail;
-				req.send();
-			}
-		}, {
-			url: 'http://' + ip + ':8080/panic.js'
-		});
-	}
-});
-
 panic.helpers = require('./helpers');
 
 module.exports = panic;

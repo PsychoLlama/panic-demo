@@ -1,5 +1,10 @@
 /*globals describe, it, before*/
-var panic = require('../');
+var panic = require('panic-server');
+
+var client = require.resolve('panic-client/panic.js');
+var clientCode = require('fs').readFileSync(client, 'utf8');
+
+panic.server().listen(8080);
 
 // Done callbacks will complain if
 // you call them more than once,
@@ -7,7 +12,23 @@ var panic = require('../');
 // This prevents that behavior, making
 // it more like a jasmine "done" callback.
 
+var create = require('phantom').create;
+var async = require('asyncawait/async');
+var await = require('asyncawait/await');
 
+var open = async (function () {
+	var instance = await (create());
+	var page = await (instance.createPage());
+	await (page.open('http://techllama.com'));
+	await (page.evaluate(Function(clientCode)));
+	await (page.evaluate(function () {
+		panic.server('http://localhost:8080');
+	}));
+	return instance;
+});
+
+open();
+open();
 
 function wrap(done) {
 	return function () {
@@ -21,20 +42,19 @@ function wrap(done) {
 
 function setup(list, done) {
 	done = wrap(done);
-	if (list.len()) {
-		done();
+	function finished() {
+		if (list.len() === 2) {
+			done();
+		}
 	}
-	list.on('add', done);
+	list.on('add', finished);
+	finished();
 }
 
-var clients = panic.clients;
+var browsers = panic.clients;
 
-var browsers = clients.filter(function (client) {
-	return client.platform.name !== 'Node.js';
-});
-
-var chrome = browsers.filter('Chrome');
-var firefox = browsers.filter('Firefox');
+var chrome = browsers.pluck(1);
+var firefox = browsers.excluding(chrome).pluck(1);
 
 describe('Panic using mocha', function () {
 	/*
@@ -52,11 +72,12 @@ describe('Panic using mocha', function () {
 
 	it('should work with async code', function () {
 		// timeout in 5 seconds
-		this.timeout(5000);
 
 		// hold for 3 seconds, then finish
-		return browsers.run(function (browser, done) {
-			setTimeout(done, 3000);
+		return browsers.run(function () {
+			console.log(this.data.msg);
+		}, {
+			msg: 'hey world'
 		});
 	});
 
@@ -72,7 +93,7 @@ describe('Panic using mocha', function () {
 
 		it('should be able to do chrome-like things', function () {
 			// run this code only on chrome browsers
-			return chrome.run(function () {
+			chrome.run(function () {
 				console.log('I am on chrome');
 			});
 		});
@@ -88,15 +109,8 @@ describe('Panic using mocha', function () {
 		it('should allow for cool firefox things', function () {
 			// Load in an external resource
 			// In this case, "expect.js".
-			return firefox.run(panic.helpers.loadScript, {
-				src: 'https://rawgit.com/Automattic/expect.js/master/index.js'
-			})
-			.then(function () {
-				// once the script is done loading,
-				// then run this function...
-				return firefox.run(function () {
-					window.expect(this.platform.name).to.be('Firefox');
-				});
+			return firefox.run(function () {
+				console.log('Yay');
 			});
 		});
 	});
